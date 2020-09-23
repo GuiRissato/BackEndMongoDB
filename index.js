@@ -1,11 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
-
-
-
-
-
+const ObjectId = mongodb.ObjectId;
 
 // criando um bloco assincrono e ja executando esse bloco
 (async () => {
@@ -69,10 +65,10 @@ res.json(objetoInserido);
 app.get('/mensagens/:id', async (req, res) => {
     // Pega o ID através dos parâmetros da requisição
     const id = req.params.id;
-
+    console.log(id);
     // Acessamos a mensagem de acordo com o ID informado
     const mensagem = await mensagens.findOne({ _id: ObjectId(id) });
-
+    
     res.json(mensagem);
 });
 
