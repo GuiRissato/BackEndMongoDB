@@ -46,26 +46,62 @@ const mensagens = await db.collection('mensagens');
 // Read All
 app.get('/mensagens', async (req, res) => {
     // busca os dados do banco e coloca num array para exibir
-    const find = await mensagens.find({}).toArray();
+    const findResult = await mensagens.find({}).toArray();
 
-    res.json(find);
+    res.json(findResult);
 });
 
 // Create
-app.post('/mensagens', (req, res) => {
-    
+app.post('/mensagens',async (req, res) => {
+// Obtendo a mensagem que foi recebida através do body da requisição
+const mensagem = req.body;
+
+// Insiro a mensagem na collection de mensagens do MongoDB
+const resultado = await mensagens.insertOne(mensagem);
+
+const objetoInserido = resultado.ops[0];
+
+// Envio a mensagem de sucesso, informando o ID obtido
+res.json(objetoInserido);
 });
 
 // Read Single
-app.get('/mensagens/:id', (req, res) => {
+app.get('/mensagens/:id', async (req, res) => {
+    // Pega o ID através dos parâmetros da requisição
+    const id = req.params.id;
+
+    // Acessamos a mensagem de acordo com o ID informado
+    const mensagem = await mensagens.findOne({ _id: ObjectId(id) });
+
+    res.json(mensagem);
 });
 
 // Update
-app.put('/mensagens/:id', (req, res) => {
+app.put('/mensagens/:id', async(req, res) => {
+    // Acessa o ID pelos parâmetros
+    const id = req.params.id;
+
+    // Obtém a mensagem que foi enviada pelo usuário no corpo (body) da requisição
+    const novaMensagem = req.body;
+
+    const mensagemAtual = await mensagens.findOne({ _id: ObjectId(id) });
+
+    mensagemAtual.texto = novaMensagem.texto;
+
+    // Atualiza a mensagem direto na lista de mensagens, acessando pelo ID que foi informado
+    const resultado = await mensagens.updateOne({ _id: ObjectId(id) }, { $set: mensagemAtual });
+
+    // Envia uma mensagem de sucesso.
+    res.json(mensagemAtual);
 });
 
 // Delete
-app.delete('/mensagens/:id', (req, res) => {
+app.delete('/mensagens/:id',async(req, res) => {
+    const id = req.params.id;
+
+    const resultado = await mensagens.deleteOne({ _id: ObjectId(id) });
+
+    res.send(`Mensagem com o ID ${id} foi removida com sucesso.`);
 });
 
 app.listen(port, () => {
