@@ -37,12 +37,18 @@ app.get('/', (req, res) => {
 // Endpoints de envio de mensagens
 // CRUD -> Create, Read (Read All e Read Single), Update and Delete
 // CRUD -> Criar, Ler (Ler tudo e ler individualmente), atualizar e remover
+const db = await client.db('Ocean_mogo_DB');
 
-const mensagens = [];
+
+// vai trazer a collection de mensagens criada no banco de dados
+const mensagens = await db.collection('mensagens');
 
 // Read All
-app.get('/mensagens', (req, res) => {
-    res.json(mensagens.filter(Boolean));
+app.get('/mensagens', async (req, res) => {
+    // busca os dados do banco e coloca num array para exibir
+    const find = await mensagens.find({}).toArray();
+
+    res.json(find);
 });
 
 // Create
